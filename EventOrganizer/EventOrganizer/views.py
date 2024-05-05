@@ -46,7 +46,7 @@ def create_event_form(request):
         form = EventForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('create')
+            return redirect('create-event')
     else:
         form = EventForm()
     return render(request, 'create_event.html', {'form': form})
