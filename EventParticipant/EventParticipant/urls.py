@@ -14,11 +14,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
-from .views import participant_home_page, show_events
+from django.urls import path, include
+from .views import participant_home_page, show_events, show_event_details, payment_failed, payment_successful
 
 urlpatterns = [
     path('api/par_home', participant_home_page, name='org_home'),
     path('api/show-events/', show_events, name='show-events'),
+    path('api/show-events/<int:event_id>', show_event_details, name='show_event_details'),
+    path('api/payment-success/<int:event_id>', payment_successful, name='payment_successful'),
+    path('api/payment-failed/<int:event_id>', payment_failed, name='payment_failed'),
+    path('api/', include('paypal.standard.ipn.urls'))
 
 ]
