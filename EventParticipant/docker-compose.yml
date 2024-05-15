@@ -8,6 +8,26 @@ services:
       - 127.0.0.1:8002:8002
     volumes:
       - .:/EventParticipant
+
+    depends_on:
+      - rabbitmq  # backend zależy od RabbitMQ
+    environment:
+      BROKER_URL: 'amqp://guest:guest@rabbitmq:5672//'  # URL RabbitMQ dla Kombu
+
+  rabbitmq:
+    image: rabbitmq:3-management  # Użycie obrazu RabbitMQ z interfejsem zarządzania
+    ports:
+      - "5672:5672"  # Port RabbitMQ
+      - "15672:15672"  # Port interfejsu zarządzania
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # Wolumin na dane RabbitMQ
+
+volumes:
+  rabbitmq_data:
+
+
+
+  
   #  depends_on:
   #    - db
 

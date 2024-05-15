@@ -4,7 +4,8 @@ from .models import Event
 from .serializers import EventSerializer
 from rest_framework.response import Response
 from .forms import EventForm
-from .producer import publish
+#from .producer import send_message
+from .tasks import add
 
 
 class EventViewSet(viewsets.ViewSet):
@@ -17,7 +18,6 @@ class EventViewSet(viewsets.ViewSet):
         serializer = EventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        publish('event_created', serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_event(self, request, pk=None):
@@ -30,14 +30,12 @@ class EventViewSet(viewsets.ViewSet):
         serializer = EventSerializer(instance=event, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        publish('event_updated', serializer.data)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
     def delete_event(self, request, pk=None):
         event = Event.objects.get(id=pk)
         event.delete()
-        publish('event_deleted', pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
