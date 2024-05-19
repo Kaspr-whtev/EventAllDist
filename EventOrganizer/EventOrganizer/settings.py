@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +28,7 @@ SECRET_KEY = 'django-insecure-1!596dz9in2o!&x*+fy3ki8l+rsxv^@kk1=rq8-i4#@739_)kq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['host.docker.internal', '127.0.0.1', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition
@@ -38,7 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'EventOrganizer'
+    'EventOrganizer',
+    # 'django_extensions'
+    # 'django_celery_results',
+    # 'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -83,14 +89,16 @@ DATABASES = {
     }
 }
 
-RABBITMQ_CONFIG = {
-    'default': {
-        'host': 'localhost',
-        'port': 5672,
-        'user': 'guest',
-        'password': 'guest',
-    },
-}
+# RABBITMQ_CONFIG = {
+#     'default': {
+#         'host': 'localhost',
+#         'port': 5672,
+#         'user': 'guest',
+#         'password': 'guest',
+#     },
+# }
+
+
 
 
 # Password validation
@@ -128,6 +136,29 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# Ustawienia Celery
+# CELERY_BROKER_URL = BROKER_URL = "amqp://guest:guest@localhost:5672//"
+# CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'UTC'
+# CELERY_BROKER_URL = BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# CELERY_TASK_DEFAULT_EXCHANGE = "celery"
+# CELERY_ACCEPT_CONTENT = ["json"]
+# CELERY_TASK_SERIALIZER = "json"
+# CELERY_TASK_QUEUES = {
+#     "data_queue": {
+#         "binding_key": "data_queue",
+#     }
+# }
+# CELERY_BROKER_HEARTBEAT = 0
+#
+# CELERY_IMPORTS = [
+#     'EventOrganizer.tasks',
+# ]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
