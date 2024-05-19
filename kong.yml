@@ -1,0 +1,28 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: test
+    url: http://host.docker.internal:8010/
+    routes:
+    - name: test-route
+      paths:
+      - /test
+  - name: example
+    url: https://example.com/
+    routes:
+      - name: example-route
+        paths:
+          - /example
+  - name: organizer
+    url: http://host.docker.internal:8003/
+    routes:
+      - name: organizer-route
+        paths:
+          - /organizer
+  - name: participant
+    url: http://host.docker.internal:8002/
+    routes:
+      - name: participant-route
+        paths:
+          - /participant
