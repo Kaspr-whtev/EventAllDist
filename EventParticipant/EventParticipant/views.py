@@ -6,11 +6,11 @@ from .forms import EventForm
 from .models import Event
 
 def participant_home_page(request):
-    return render(request, 'par_home.html')
+    return render(request, 'par_home.html', context={"path_show_events": '/participant/api/show-events/'})
 
 def show_events(request):
     events = Event.objects.all()
-    return render(request, 'show_events.html', {'events': events})
+    return render(request, 'show_events.html', context={'events': events, 'path_par_home': '/participant/api/par_home'})
 
 
 @csrf_exempt

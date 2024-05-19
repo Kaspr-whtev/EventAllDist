@@ -56,8 +56,6 @@ def create_event_form(request):
             r = requests.post('http://127.0.0.1:8002/api/get_event/', data=request.POST)
             print(r.status_code)
 
-
-            # return redirect('create-event')
             return redirect('/organizer/api/create/')
     else:
         form = EventForm()
