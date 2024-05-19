@@ -5,9 +5,10 @@ services:
       context: .
       dockerfile: DockerFile
     ports:
-      - 8000:8000
+      - 127.0.0.1:8003:8003
     volumes:
       - .:/EventOrganizer
+
     depends_on:
       - rabbitmq  # backend zależy od RabbitMQ
     environment:

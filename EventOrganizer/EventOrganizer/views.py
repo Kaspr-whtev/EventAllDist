@@ -4,6 +4,8 @@ from .models import Event
 from .serializers import EventSerializer
 from rest_framework.response import Response
 from .forms import EventForm
+from django.views.decorators.csrf import csrf_exempt
+import requests
 #from .producer import send_message
 from .tasks import add
 
@@ -18,6 +20,10 @@ class EventViewSet(viewsets.ViewSet):
         serializer = EventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        print('created')
+        # r = requests.get('https://httpbin.org/basic-auth/user/pass')
+        # r.status_code
+        #
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_event(self, request, pk=None):
@@ -37,17 +43,26 @@ class EventViewSet(viewsets.ViewSet):
         event = Event.objects.get(id=pk)
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
+
+@csrf_exempt
 def create_event_form(request):
+    print("create event form", request.method)
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('create-event')
+
+            r = requests.post('http://127.0.0.1:8002/api/get_event/', data=request.POST)
+            print(r.status_code)
+
+
+            # return redirect('create-event')
+            return redirect('/organizer/api/create/')
     else:
         form = EventForm()
     return render(request, 'create_event.html', {'form': form})
 
+
 def organizer_home_page(request):
-    return render(request, 'org_home.html')
+    return render(request, 'org_home.html', context={"path": '/organizer/api/create/'})

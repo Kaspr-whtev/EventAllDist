@@ -14,3 +14,15 @@ services:
       - name: example-route
         paths:
           - /example
+  - name: organizer
+    url: http://host.docker.internal:8003/
+    routes:
+      - name: organizer-route
+        paths:
+          - /organizer
+  - name: participant
+    url: http://host.docker.internal:8002/
+    routes:
+      - name: participant-route
+        paths:
+          - /participant
