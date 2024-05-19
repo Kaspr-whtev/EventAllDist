@@ -25,6 +25,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8003
     ports:
       - "8003:8003"
+    volumes:
+      - app1:/EventOrganizer/
 
   eventparticipant:
     build:
@@ -33,3 +35,9 @@ services:
     command: python manage.py runserver 0.0.0.0:8002
     ports:
       - "8002:8002"
+    volumes:
+      - app2:/EventParticipant/
+
+volumes:
+ app1:
+ app2:
