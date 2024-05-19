@@ -1,0 +1,20 @@
+<!-- event_details.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details</title>
+</head>
+<body>
+    <h1>Event Details</h1>
+    <ul>
+        <li><strong>Name:</strong> {{ event.name }}</li>
+        <li><strong>Date:</strong> {{ event.date }}</li>
+        <li><strong>Place:</strong> {{ event.place }}</li>
+        {{paypal.render}}
+    </ul>
+    <a href="{% url 'org_home' %}">Back to Home</a>
+</body>
+</html>

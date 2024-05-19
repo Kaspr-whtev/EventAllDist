@@ -5,5 +5,3 @@ COPY requirements.txt /EventAuth/requirements.txt
 RUN pip install -r requirements.txt
 COPY . /EventAuth
 
-
-CMD python manage.py runserver 0.0.0.0:8000

@@ -33,3 +33,19 @@ services:
     command: python manage.py runserver 0.0.0.0:8002
     ports:
       - "8002:8002"
+  
+  eventnotification:
+   build:
+     context: EventNotification
+     dockerfile: DockerFile
+   command: python manage.py runserver 0.0.0.0:8004
+   ports:
+     - "8004:8004" 
+
+  eventauth:
+   build:
+     context: EventAuth
+     dockerfile: DockerFile
+   command: python manage.py runserver 0.0.0.0:8005
+   ports:
+     - "8005:8005" 

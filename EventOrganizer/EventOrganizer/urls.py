@@ -18,17 +18,17 @@ from django.urls import path
 from .views import EventViewSet, create_event_form, organizer_home_page
 
 urlpatterns = [
-    path('api/org_home', organizer_home_page, name='org_home'),
-    path('api/events', EventViewSet.as_view({
+    path('organizer/api/org_home', organizer_home_page, name='org_home'),
+    path('organizer/api/events', EventViewSet.as_view({
         'get': 'list_events',
         'post': 'create_event',
     })),
 
-    path('api/events/<str:pk>', EventViewSet.as_view({
+    path('organizer/api/events/<str:pk>', EventViewSet.as_view({
         'get': 'get_event',
         'put': 'update_event',
         'delete': 'delete_event'
     })),
-    path('api/create/', create_event_form, name='create-event'),
+    path('organizer/api/create/', create_event_form, name='create-event'),
 
 ]

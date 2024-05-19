@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-pben@86jfl58cat@$0p)r&mmp%uxahootycktmvyv**l_!ssat
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['host.docker.internal', '127.0.0.1']
+ALLOWED_HOSTS = ['host.docker.internal', '127.0.0.1', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition
@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'django_extensions',
+    #'django_extensions',
     'EventParticipant',
+    'paypal.standard.ipn',
     # 'celery',
     # 'kombu.transport.django',
 ]
@@ -150,3 +151,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+PAYPAL_RECEIVER_EMAIL = 'businesstestevent@business.example.com'
+PAYPAL_TEST = True
