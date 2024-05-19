@@ -17,3 +17,19 @@ services:
       - "8443:8443"
       - "127.0.0.1:8001:8001"
       - "127.0.0.1:8444:8444"
+
+  eventorganizer:
+    build:
+      context: EventOrganizer
+      dockerfile: DockerFile
+    command: python manage.py runserver 0.0.0.0:8003
+    ports:
+      - "8003:8003"
+
+  eventparticipant:
+    build:
+      context: EventParticipant
+      dockerfile: DockerFile
+    command: python manage.py runserver 0.0.0.0:8002
+    ports:
+      - "8002:8002"

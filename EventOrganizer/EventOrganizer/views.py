@@ -7,7 +7,7 @@ from .forms import EventForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 #from .producer import send_message
-from .tasks import add
+# from .tasks import add
 
 
 class EventViewSet(viewsets.ViewSet):

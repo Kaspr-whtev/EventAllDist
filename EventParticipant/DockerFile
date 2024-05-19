@@ -3,9 +3,5 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /EventParticipant
 COPY requirements.txt /EventParticipant/requirements.txt
 RUN pip install -r requirements.txt
-RUN pip install kombu
-RUN pip install django-kombu
 COPY . /EventParticipant
 
-
-CMD python manage.py runserver 0.0.0.0:8002
