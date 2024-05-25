@@ -20,7 +20,7 @@ from .views import participant_home_page, show_events, show_event_details, payme
 urlpatterns = [
     path('participant/api/par_home', participant_home_page, name='org_home'),
     path('participant/api/show-events/', show_events, name='show-events'),
-    path('participant/api/get_event/', get_event, name='get_event'),
+    path('api/get_event/', get_event, name='get_event'),
     path('participant/api/show-events/<int:event_id>', show_event_details, name='show_event_details'),
     path('api/payment-success/<int:event_id>', payment_successful, name='payment_successful'),
     path('api/payment-failed/<int:event_id>', payment_failed, name='payment_failed'),

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from .views import EventViewSet, create_event_form, organizer_home_page
+from .views import EventViewSet, create_event_form, organizer_home_page, show_events
 
 urlpatterns = [
     path('organizer/api/org_home', organizer_home_page, name='org_home'),
@@ -30,5 +30,7 @@ urlpatterns = [
         'delete': 'delete_event'
     })),
     path('organizer/api/create/', create_event_form, name='create-event'),
+    path('organizer/api/show-events/', show_events, name='show-events'),
+
 
 ]

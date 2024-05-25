@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Organizer - Show Events</title>
+</head>
+
+<body>
+    <h1>Events List</h1>
+    <ul>
+        {% if events %}
+        <ul>
+            {% for event in events %}
+            <li>
+                <h3>{{ event.name }}</h3>
+                <p><strong>Date:</strong> {{ event.date }}</p>
+                <p><strong>Place:</strong> {{ event.place }}</p>
+                <p><strong>Organizer:</strong> {{ event.organizer_name }}</p>
+                <p><strong>Ticket Price:</strong> {{ event.ticket_price }}</p>
+                <p><strong>Description:</strong> {{ event.description }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No upcoming events.</p>
+        {% endif %}
+    </ul>
+    <a href={{path_org_home}}>Back to Home</a>
+</body>
+
+</html>

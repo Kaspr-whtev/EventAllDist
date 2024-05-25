@@ -19,7 +19,7 @@ def show_events(request):
 @csrf_exempt
 def get_event(request):
     print("create event form", request.method, request.POST)
-    if request.method == 'POST':
+    if request.method == "POST":
         data = request.POST.dict()
         print(data)
         data["name"] = data.pop("organizer_name", "")

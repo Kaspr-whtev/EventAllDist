@@ -64,4 +64,8 @@ def create_event_form(request):
 
 
 def organizer_home_page(request):
-    return render(request, 'org_home.html', context={"path": '/organizer/api/create/'})
+    return render(request, 'org_home.html', context={"path": '/organizer/api/create/', "path_show_events": '/organizer/api/show-events/'})
+
+def show_events(request):
+    events = Event.objects.all()
+    return render(request, 'show_events.html', context={'events': events, 'path_org_home': '/organizer/api/org_home'})

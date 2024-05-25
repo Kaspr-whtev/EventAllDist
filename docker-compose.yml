@@ -26,7 +26,10 @@ services:
     ports:
       - "8003:8003"
     volumes:
-      - app1:/EventOrganizer/
+      #- app1:/EventOrganizer/
+      - app1:/app
+      - ./EventOrganizer:/app/EventOrganizer
+
 
   eventparticipant:
     build:
@@ -36,8 +39,10 @@ services:
     ports:
       - "8002:8002"
     volumes:
-      - app2:/EventParticipant/
-  
+      #- app2:/EventParticipant/
+      - app2:/app
+      - ./EventParticipant:/app/EventParticipant
+
   eventnotification:
     build:
       context: EventNotification
@@ -46,18 +51,22 @@ services:
     ports:
       - "8004:8004"
     volumes:
-      - app3:/EventNotification/
+      #- app3:/EventNotification/
+      - app3:/app
+      - ./EventNotification:/app/EventNotification
   
 
   eventauth:
     build:
       context: EventAuth
       dockerfile: DockerFile
-    command: python manage.py runserver 0.0.0.0:8005
+    command: python manage.py runserver 0.0.0.0:8006
     ports:
-      - "8005:8005" 
+      - "8006:8006" 
     volumes:
-      - app4:/EventAuth/
+      #- app4:/EventAuth/
+      - app4:/app
+      - ./EventAuth:/app/EventAuth
 
 volumes:
  app1:
