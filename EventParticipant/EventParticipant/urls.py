@@ -15,14 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from .views import participant_home_page, show_events, show_event_details, payment_failed, payment_successful, get_event
+from .views import participant_home_page, show_events, show_event_details, get_event, product_page, payment_successful, payment_cancelled, stripe_webhook
 
 urlpatterns = [
     path('participant/api/par_home', participant_home_page, name='org_home'),
     path('participant/api/show-events/', show_events, name='show-events'),
     path('api/get_event/', get_event, name='get_event'),
     path('participant/api/show-events/<int:event_id>', show_event_details, name='show_event_details'),
-    path('api/payment-success/<int:event_id>', payment_successful, name='payment_successful'),
-    path('api/payment-failed/<int:event_id>', payment_failed, name='payment_failed'),
-    path('api/', include('paypal.standard.ipn.urls'))
+    #path('api/payment-success/<int:event_id>', payment_successful, name='payment_successful'),
+    #path('api/payment-failed/<int:event_id>', payment_failed, name='payment_failed'),
+    #path('api/', include('paypal.standard.ipn.urls')),
+    path('product_page', product_page, name='product_page'),
+	path('payment_successful', payment_successful, name='payment_successful'),
+	path('payment_cancelled', payment_cancelled, name='payment_cancelled'),
+	path('stripe_webhook', stripe_webhook, name='stripe_webhook'),
 ]

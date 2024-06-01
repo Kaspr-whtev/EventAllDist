@@ -3,6 +3,8 @@ from django.contrib.auth import logout, login, authenticate
 from .forms import CreateUserForm, LoginForm
 from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 
@@ -31,10 +33,9 @@ def register(request):
     return render(request, 'register.html', context=context)
 
 
-def my_login(request):
+from django.shortcuts import redirect
 
-    form = LoginForm()
-    
+def my_login(request):
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
@@ -44,13 +45,22 @@ def my_login(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
+                # Zalogowanie się powiodło, generuj token JWT
+                refresh = RefreshToken.for_user(user)
                 auth.login(request, user)
-                return redirect("dashboard")
+                request.session['jwt_token'] = str(refresh.access_token)  # Zapisz token JWT w sesji
+                return redirect('dashboard')
+            else:
+                # Zalogowanie się nie powiodło
+                return JsonResponse({'error': 'Invalid credentials'}, status=400)
+    else:
+        form = LoginForm()
 
     context = {'loginform': form}
-
     return render(request, 'my-login.html', context=context)
+
 
 @login_required(login_url="my-login")
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    generated_jwt = request.session.get('jwt_token')  # Pobierz token JWT z sesji
+    return render(request, 'dashboard.html', {'generated_jwt': generated_jwt})

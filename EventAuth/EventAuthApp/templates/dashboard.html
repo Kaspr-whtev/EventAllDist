@@ -1,9 +1,12 @@
 <html>
     <h1>This is the dashboard</h1>
 
+    {% if generated_jwt %}
+    <p>Token JWT: {{ generated_jwt }}</p>
+    {% else %}
+    <p>No token found!</p>
+    {% endif %}
+
     <a href="{% url 'user-logout' %}">Logout</a>
-
-
-
 
 </html>

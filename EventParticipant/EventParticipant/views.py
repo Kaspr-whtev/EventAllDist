@@ -1,5 +1,5 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .forms import EventForm
 from .models import Event
@@ -7,6 +7,9 @@ from paypal.standard.forms import PayPalPaymentsForm
 from django.conf import settings
 import uuid
 from django.urls import reverse
+import stripe
+import time
+from EventParticipant.models import UserPayment
 
 def participant_home_page(request):
     return render(request, 'par_home.html', context={"path_show_events": '/participant/api/show-events/'})
@@ -56,10 +59,87 @@ def show_event_details(request, event_id):
     # Przekazujesz obiekt wydarzenia do szablonu HTML
     return render(request, 'event_details.html', context)
 
-def payment_successful(request, event_id):
-    event = Event.objects.get(id=event_id)
-    return render(request, 'payment_success.html', {'event': event})
+# def payment_successful(request, event_id):
+#     event = Event.objects.get(id=event_id)
+#     return render(request, 'payment_success.html', {'event': event})
 
-def payment_failed(request, event_id):
-    event = Event.objects.get(id=event_id)
-    return render(request, 'payment_failed.html', {'event': event})
+# def payment_failed(request, event_id):
+#     event = Event.objects.get(id=event_id)
+#     return render(request, 'payment_failed.html', {'event': event})
+
+
+def product_page(request):
+	stripe.api_key = settings.STRIPE_SECRET_KEY_TEST
+	if request.method == 'POST':
+		checkout_session = stripe.checkout.Session.create(
+			payment_method_types = ['card'],
+			line_items = [
+				{
+					'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': "test_name",
+                        },
+                        'unit_amount': int(5 * 100),  # Stripe wymaga kwoty w centach
+                    },
+					'quantity': 1,
+				},
+			],
+			mode = 'payment',
+			customer_creation = 'always',
+			success_url = settings.REDIRECT_DOMAIN + '/payment_successful?session_id={CHECKOUT_SESSION_ID}',
+			cancel_url = settings.REDIRECT_DOMAIN + '/payment_cancelled',
+		)
+		return redirect(checkout_session.url, code=303)
+	return render(request, 'product_page.html')
+
+
+def payment_successful(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY_TEST
+    checkout_session_id = request.GET.get('session_id', None)
+    
+    if checkout_session_id is not None:
+        session = stripe.checkout.Session.retrieve(checkout_session_id)
+        customer = stripe.Customer.retrieve(session.customer)
+        
+        
+        # user_payment = UserPayment.objects.get(app_user=user_id)
+        # user_payment.stripe_checkout_id = checkout_session_id
+        # user_payment.save()
+        new_payment = UserPayment(payment_bool=True, stripe_checkout_id=checkout_session_id)
+        new_payment.save()
+        
+        return render(request, 'payment_successful.html', {'customer': customer})
+    else:
+        # Obsłuż przypadek braku session_id
+        return render(request, 'payment_failed.html')
+
+
+def payment_cancelled(request):
+	stripe.api_key = settings.STRIPE_SECRET_KEY_TEST
+	return render(request, 'payment_cancelled.html')
+
+
+@csrf_exempt
+def stripe_webhook(request):
+	stripe.api_key = settings.STRIPE_SECRET_KEY_TEST
+	time.sleep(10)
+	payload = request.body
+	signature_header = request.META['HTTP_STRIPE_SIGNATURE']
+	event = None
+	try:
+		event = stripe.Webhook.construct_event(
+			payload, signature_header, settings.STRIPE_WEBHOOK_SECRET_TEST
+		)
+	except ValueError as e:
+		return HttpResponse(status=400)
+	except stripe.error.SignatureVerificationError as e:
+		return HttpResponse(status=400)
+	if event['type'] == 'checkout.session.completed':
+		session = event['data']['object']
+		session_id = session.get('id', None)
+		time.sleep(15)
+		user_payment = UserPayment.objects.get(stripe_checkout_id=session_id)
+		user_payment.payment_bool = True
+		user_payment.save()
+	return HttpResponse(status=200)
