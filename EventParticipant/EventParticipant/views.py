@@ -10,6 +10,10 @@ from django.urls import reverse
 import stripe
 import time
 from EventParticipant.models import UserPayment
+from rest_framework_simplejwt.tokens import RefreshToken
+import requests
+import jwt
+
 
 def participant_home_page(request):
     return render(request, 'par_home.html', context={"path_show_events": '/participant/api/show-events/'})
@@ -143,3 +147,33 @@ def stripe_webhook(request):
 		user_payment.payment_bool = True
 		user_payment.save()
 	return HttpResponse(status=200)
+
+
+def some_view(request):
+    # Uzyskanie ciasteczka JWT z żądania
+    jwt_token = request.COOKIES.get('JWT', None)
+
+    # Możesz teraz wykorzystać wartość ciasteczka JWT, na przykład:
+    jwt_payload = None
+    error_message = None
+    username = None
+    email = None
+
+    if jwt_token:
+        # Dekodowanie zawartości tokena JWT
+        try:
+            jwt_payload = jwt.decode(jwt_token, key='secret', algorithms=['HS256'])  # Dodaj algorytm dekodowania
+            # Sprawdź, czy payload zawiera nazwę użytkownika i adres e-mail
+            if 'username' in jwt_payload:
+                username = jwt_payload['username']
+            if 'email' in jwt_payload:
+                email = jwt_payload['email']
+        except jwt.ExpiredSignatureError:
+            error_message = 'Token JWT wygasł.'
+        except jwt.InvalidTokenError as e:
+            error_message = f'Nieprawidłowy token JWT: {str(e)}'
+
+    # Przekazanie danych do szablonu HTML
+    context = {'jwt_payload': jwt_payload, 'jwt_token': jwt_token, 'error_message': error_message, 'username': username, 'email': email}
+    return render(request, 'some_template.html', context=context)
+

@@ -5,6 +5,14 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse, HttpResponseRedirect
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError, UntypedToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken
+import json
+from django.urls import reverse
+import jwt
+
 
 # Create your views here.
 
@@ -15,7 +23,10 @@ def home(request):
 
 def logout_view(request):
     auth.logout(request)
-    return redirect('/')
+    response = redirect('/')
+    response.delete_cookie('JWT')
+
+    return response
 
 
 def register(request):
@@ -33,7 +44,6 @@ def register(request):
     return render(request, 'register.html', context=context)
 
 
-from django.shortcuts import redirect
 
 def my_login(request):
     if request.method == "POST":
@@ -45,11 +55,26 @@ def my_login(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
+                payload = {
+                    'username': user.username,  # Dodaj nazwę użytkownika do payloadu
+                    'email': user.email,  # Dodaj email użytkownika do payloadu
+                }
                 # Zalogowanie się powiodło, generuj token JWT
                 refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                print("Acces token = ", access_token)
+                jwt_token = jwt.encode(payload, key='secret', algorithm='HS256')  # Koduj payload do tokena JWT
+
                 auth.login(request, user)
-                request.session['jwt_token'] = str(refresh.access_token)  # Zapisz token JWT w sesji
-                return redirect('dashboard')
+
+                print("Zawartosc payloadu:", payload)
+
+                
+                # Ustawienie ciasteczka JWT
+                response = redirect('dashboard')
+                response.set_cookie('JWT', jwt_token, httponly=False)  # Ustawienie ciasteczka JWT z dostępem tylko przez HTTP
+                
+                return response  # Przekierowanie użytkownika do strony głównej lub innej widocznej strony po zalogowaniu
             else:
                 # Zalogowanie się nie powiodło
                 return JsonResponse({'error': 'Invalid credentials'}, status=400)
@@ -63,4 +88,35 @@ def my_login(request):
 @login_required(login_url="my-login")
 def dashboard(request):
     generated_jwt = request.session.get('jwt_token')  # Pobierz token JWT z sesji
+    if generated_jwt:
+        print(f"JWT token in session: {generated_jwt}")
     return render(request, 'dashboard.html', {'generated_jwt': generated_jwt})
+
+
+def verify_token(request):
+    print("Received request in verify_token")  # Debugowanie
+    if request.method == 'POST':
+        print("Request method is POST")  # Debugowanie
+        try:
+            data = json.loads(request.body)
+            jwt_token = data.get('jwt_token')
+            
+            if not jwt_token:
+                print("No token in request")  # Debugowanie
+                return JsonResponse({'error': 'Token is missing'}, status=400)
+
+            print(f"JWT token: {jwt_token}")  # Debugowanie
+            # Weryfikacja tokena JWT
+            token = UntypedToken(jwt_token)
+            validated_token = JWTAuthentication().get_validated_token(token)
+            user = JWTAuthentication().get_user(validated_token)
+
+            # Zwrot danych użytkownika
+            return JsonResponse({'username': user.username, 'email': user.email})
+        except (TokenError, InvalidToken) as e:
+            print(f"Token error: {str(e)}")  # Debugowanie
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        print("Invalid request method")  # Debugowanie
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+

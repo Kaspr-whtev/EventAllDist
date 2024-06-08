@@ -20,6 +20,8 @@
                 <p><strong>Organizer:</strong> {{ event.organizer_name }}</p>
                 <p><strong>Ticket Price:</strong> {{ event.ticket_price }}</p>
                 <p><strong>Description:</strong> {{ event.description }}</p>
+                <a href="{% url 'edit_event' event.id %}"><button>Edit</button></a>
+                <a href="{% url 'confirm_delete_event' event.id %}"><button>Delete</button></a>
             </li>
             {% endfor %}
         </ul>
