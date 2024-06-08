@@ -16,7 +16,18 @@
     command: python manage.py runserver 0.0.0.0:8002
     ports:
       - "8002:8002" 
+    volumes:
+      - app2:/app
+      - ./EventParticipant:/app/EventParticipant
  ```
+
+  1.5. dodać na końcu `docker-compose.yml` do volumes app jaki byl podany w service:
+  ```
+  volumes:
+    app1:
+    app2:
+
+  ```
  2. stworzyć plik DockerFile wewnątrz mikroserwisu, przykład:
  ```
 FROM python:3.9
@@ -69,8 +80,8 @@ def create_event_form(request):
         form = EventForm(request.POST)
         if form.is_valid():
             form.save()
-
-            r = requests.post('http://127.0.0.1:8002/api/get_event/', data=request.POST)
+            print(Event.objects.all())
+            r = requests.post('http://eventparticipant:8002/api/get_event/', data=request.POST)
             print(r.status_code)
 
             return redirect('/organizer/api/create/')
