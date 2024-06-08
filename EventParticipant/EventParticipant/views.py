@@ -38,22 +38,22 @@ def show_event_details(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     host = request.get_host()
 
-    paypal_checkout = {
-        'business': settings.PAYPAL_RECEIVER_EMAIL,
-        'amount': Event.ticket_price,
-        'item_name': Event.name,
-        'invoice': uuid.uuid4(),
-        'currency_code': 'USD',
-        'notify_url': f"http://{host}{reverse('paypal-ipn')}",
-        'return_url': f"http://{host}{reverse('payment_successful', kwargs = {'event_id': event_id})}",
-        'cancel_url': f"http://{host}{reverse('payment_failed', kwargs = {'event_id': event_id})}",
-    }
+    # paypal_checkout = {
+    #     'business': settings.PAYPAL_RECEIVER_EMAIL,
+    #     'amount': Event.ticket_price,
+    #     'item_name': Event.name,
+    #     'invoice': uuid.uuid4(),
+    #     'currency_code': 'USD',
+    #     'notify_url': f"http://{host}{reverse('paypal-ipn')}",
+    #     'return_url': f"http://{host}{reverse('payment_successful', kwargs = {'event_id': event_id})}",
+    #     'cancel_url': f"http://{host}{reverse('payment_failed', kwargs = {'event_id': event_id})}",
+    # }
 
-    paypal_payment_form = PayPalPaymentsForm(initial=paypal_checkout)
+    # paypal_payment_form = PayPalPaymentsForm(initial=paypal_checkout)
 
     context = {
         'event': event,
-        'paypal': paypal_payment_form
+        #'paypal': paypal_payment_form
     }
 
     # Przekazujesz obiekt wydarzenia do szablonu HTML
