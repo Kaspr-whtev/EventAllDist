@@ -31,6 +31,18 @@ urlpatterns = [
     })),
     path('organizer/api/create/', create_event_form, name='create-event'),
     path('organizer/api/show-events/', show_events, name='show-events'),
+    path('organizer/api/events/<str:pk>/edit/', EventViewSet.as_view({
+        'get': 'edit_event_form',
+        'post': 'edit_event_form'
+    }), name='edit_event'),
+    path('organizer/api/events/<str:pk>/delete/', EventViewSet.as_view({
+        'post': 'delete_event_form'
+    }), name='delete_event'),
+    path('organizer/api/events/<str:pk>/confirm_delete/', EventViewSet.as_view({
+        'get': 'confirm_delete_event',
+        'post': 'confirm_delete_event'
+    }), name='confirm_delete_event'),
+
 
 
 ]

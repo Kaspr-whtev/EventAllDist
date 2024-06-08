@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status
 from .models import Event
 from .serializers import EventSerializer
 from rest_framework.response import Response
-from .forms import EventForm
+from .forms import EventForm, DeleteEventForm, EditEventForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 #from .producer import send_message
@@ -43,6 +43,46 @@ class EventViewSet(viewsets.ViewSet):
         event = Event.objects.get(id=pk)
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def edit_event_form(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        reason_for_edit_form = EditEventForm(request.POST or None)  # Nowa instancja formularza tylko dla powodu edycji
+        if request.method == 'POST':
+            form = EventForm(request.POST, instance=event)
+            if form.is_valid():
+                reason_for_edit = reason_for_edit_form['reason_for_edit'].value()  # Pobieramy wartość pola z formularza ReasonForEditForm
+                print(f"Successful edit with reason: {reason_for_edit}")
+                form.save()
+                return redirect('show-events')
+        else:
+            form = EventForm(instance=event)
+        return render(request, 'edit_event.html', {'form': form, 'event': event, 'reason_for_edit_form': reason_for_edit_form})
+
+
+    
+    def delete_event_form(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        if request.method == 'POST':
+            event.delete()
+            return redirect('show-events')
+        return redirect('show-events')
+    
+    def confirm_delete_event(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        if request.method == 'POST':
+            form = DeleteEventForm(request.POST)
+            if form.is_valid():
+                reason = form.cleaned_data['reason']
+                # Here you can save the reason to the database or perform other actions
+                event.delete()
+                return redirect('show-events')
+        else:
+            form = DeleteEventForm()
+        return render(request, 'confirm_delete_event.html', {'form': form, 'event': event})
+
+
+
+
 
 
 @csrf_exempt

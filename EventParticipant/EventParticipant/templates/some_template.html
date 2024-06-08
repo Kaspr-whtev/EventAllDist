@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informacje z JWT</title>
+</head>
+<body>
+    <h1>Informacje z JWT</h1>
+    {% if jwt_payload %}
+        <p><strong>Token JWT:</strong> {{ jwt_token }}</p>
+        <p><strong>Payload:</strong></p>
+        <ul>
+            {% for key, value in jwt_payload.items %}
+                <li><strong>{{ key }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% elif error_message %}
+        <p><strong>Error:</strong> {{ error_message }}</p>
+    {% else %}
+        <p><strong>Brak ciasteczka JWT.</strong></p>
+    {% endif %}
+</body>
+</html>
