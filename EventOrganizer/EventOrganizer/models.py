@@ -8,5 +8,10 @@ class Event(models.Model):
     name = models.CharField(max_length=255, default="")
     description = models.TextField(default="", null=True)
 
+
+class Organizer(models.Model):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, default=None, null=True)
+
     def __str__(self):
         return self.name

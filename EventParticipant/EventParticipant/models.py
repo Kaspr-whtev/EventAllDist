@@ -14,7 +14,11 @@ class UserPayment(models.Model):
     #app_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     payment_bool = models.BooleanField(default=False)
     stripe_checkout_id = models.CharField(max_length=500)
-   
+
+
+class Participant(models.Model):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, default=None, null=True)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
