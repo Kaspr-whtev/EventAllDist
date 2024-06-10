@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 
 
 class Event(models.Model):
+    id = models.IntegerField(primary_key=True)
     date = models.DateTimeField()
     place = models.CharField(max_length=100)
     name = models.CharField(max_length=255, default="")

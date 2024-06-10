@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .forms import EventForm, DeleteEventForm, EditEventForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
+from django.forms.models import model_to_dict
 #from .producer import send_message
 # from .tasks import add
 
@@ -91,10 +92,13 @@ def create_event_form(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            form.save()
-            print(Event.objects.all())
-
-            r = requests.post('http://eventparticipant:8002/api/get_event/', data=request.POST)
+            new_event = form.save()
+            # print(new_event.id)
+            # data = request.POST
+            # print(data)
+            # data["id"] = [new_event.id]
+            print(model_to_dict(new_event))
+            r = requests.post('http://eventparticipant:8002/api/get_event/', data=model_to_dict(new_event))
             print(r.status_code)
 
             return redirect('/organizer/api/create/')

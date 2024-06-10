@@ -29,7 +29,7 @@ def get_event(request):
     if request.method == "POST":
         data = request.POST.dict()
         print(data)
-        data["name"] = data.pop("organizer_name", "")
+        # data["name"] = data.pop("organizer_name", "")
         form = EventForm(data)
 
         if form.is_valid():
