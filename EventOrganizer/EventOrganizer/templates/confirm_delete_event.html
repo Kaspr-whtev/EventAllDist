@@ -13,7 +13,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Confirm Delete</button>
-        <a href="{% url 'show-events' %}"><button type="button">Cancel</button></a>
+        <a href={{ show_events_path }}}><button type="button">Cancel</button></a>
     </form>
 </body>
 

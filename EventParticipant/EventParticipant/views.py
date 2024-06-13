@@ -37,6 +37,7 @@ def get_event(request):
 
     return JsonResponse(data={})
 
+
 def show_event_details(request, event_id):
     # Pobierz obiekt wydarzenia na podstawie przekazanego identyfikatora
     event = get_object_or_404(Event, pk=event_id)

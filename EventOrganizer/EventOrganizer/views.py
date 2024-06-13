@@ -75,11 +75,13 @@ class EventViewSet(viewsets.ViewSet):
             if form.is_valid():
                 reason = form.cleaned_data['reason']
                 # Here you can save the reason to the database or perform other actions
+                r = requests.post('http://eventparticipant:8002/api/delete_event/', data=model_to_dict(event))
                 event.delete()
-                return redirect('show-events')
+                # return redirect('show-events')
+                return redirect('/organizer/api/show-events/')
         else:
             form = DeleteEventForm()
-        return render(request, 'confirm_delete_event.html', {'form': form, 'event': event})
+        return render(request, 'confirm_delete_event.html', context={'form': form, 'event': event, "show_events_path":'/organizer/api/show-events/'})
 
 
 
@@ -93,10 +95,6 @@ def create_event_form(request):
         form = EventForm(request.POST)
         if form.is_valid():
             new_event = form.save()
-            # print(new_event.id)
-            # data = request.POST
-            # print(data)
-            # data["id"] = [new_event.id]
             print(model_to_dict(new_event))
             r = requests.post('http://eventparticipant:8002/api/get_event/', data=model_to_dict(new_event))
             print(r.status_code)
