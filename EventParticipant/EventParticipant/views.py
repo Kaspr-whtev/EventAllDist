@@ -39,11 +39,12 @@ def get_event(request):
     if request.method == "POST":
         data = request.POST.dict()
         print(data)
-        # data["name"] = data.pop("organizer_name", "")
+        data["primary"] = data.pop("id", "")
         form = EventForm(data)
 
         if form.is_valid():
             form.save()
+            print(Event.objects.all())
 
     return JsonResponse(data={})
 
@@ -52,12 +53,37 @@ def get_user(request):
     print("create user form", request.method, request.POST)
     if request.method == "POST":
         data = request.POST.dict()
-        print(data)
+        # print(data)
         # data["name"] = data.pop("organizer_name", "")
         form = NewUserForm(data)
 
         if form.is_valid():
             form.save()
+
+    return JsonResponse(data={})
+
+
+@csrf_exempt
+def delete_event(request):
+    print("delete ", request.method, request.POST)
+    if request.method == "POST":
+        data = request.POST.dict()
+        print(Event.objects.all())
+        event = Event.objects.get(pk=data.get("id"))
+        event.delete()
+
+    return JsonResponse(data={})
+
+
+@csrf_exempt
+def edit_event(request):
+    print("edit ", request.method, request.POST)
+    if request.method == "POST":
+        data = request.POST.dict()
+        print(Event.objects.all())
+        event = Event.objects.get(pk=data.get("id"))
+        form = EventForm(request.POST, instance=event)
+        form.save()
 
     return JsonResponse(data={})
 

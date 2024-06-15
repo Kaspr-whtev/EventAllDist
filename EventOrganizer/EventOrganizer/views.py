@@ -55,11 +55,13 @@ class EventViewSet(viewsets.ViewSet):
             if form.is_valid():
                 reason_for_edit = reason_for_edit_form['reason_for_edit'].value()  # Pobieramy wartość pola z formularza ReasonForEditForm
                 print(f"Successful edit with reason: {reason_for_edit}")
-                form.save()
+                edited_event = form.save()
+                r = requests.post('http://eventparticipant:8002/api/edit_event/', data=model_to_dict(edited_event))
+                print(r.status_code)
                 return redirect('show-events')
         else:
             form = EventForm(instance=event)
-        return render(request, 'edit_event.html', {'form': form, 'event': event, 'reason_for_edit_form': reason_for_edit_form})
+        return render(request, 'edit_event.html', {'form': form, 'event': event, 'reason_for_edit_form': reason_for_edit_form, 'show_events_path':'/organizer/api/show-events/'})
 
 
     
