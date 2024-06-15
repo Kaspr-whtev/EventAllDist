@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets, status
-from .models import Event
+from .models import Event, Participant
 from .serializers import EventSerializer
 from rest_framework.response import Response
-from .forms import EventForm, DeleteEventForm, EditEventForm
+from .forms import EventForm, DeleteEventForm, EditEventForm, NewUserForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.forms.models import model_to_dict
+from django.http import HttpResponse, JsonResponse
+
 #from .producer import send_message
 # from .tasks import add
 
@@ -111,3 +113,23 @@ def organizer_home_page(request):
 def show_events(request):
     events = Event.objects.all()
     return render(request, 'show_events.html', context={'events': events, 'path_org_home': '/organizer/api/org_home'})
+
+
+
+@csrf_exempt
+def get_user(request):
+    print("create user form", request.method, request.POST)
+    if request.method == "POST":
+        data = request.POST.dict()
+        print(data)
+        # data["name"] = data.pop("organizer_name", "")
+        form = NewUserForm(data)
+
+        if form.is_valid():
+            form.save()
+
+    return JsonResponse(data={})
+
+def show_users(request):
+    users = Participant.objects.all()
+    return render(request, 'show_users.html', context={'users': users, 'path_org_home': '/organizer/api/org_home'})

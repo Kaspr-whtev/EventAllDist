@@ -15,6 +15,12 @@
                 href="/participant/api/show-events/{{ event.id }}">Szczegóły</a></li>
         {% endfor %}
     </ul>
+    <h2>Users</h2>
+    <ul>
+        {% for user in users %}
+        <li>{{ user.username }} ({{ user.email }})</li>
+        {% endfor %}
+    </ul>
     <a href={{path_par_home}}>Back to Home</a>
 </body>
 

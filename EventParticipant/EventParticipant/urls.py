@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.urls import path, include
 from .views import participant_home_page, show_events, show_event_details, get_event, product_page, payment_successful, \
-    payment_cancelled, stripe_webhook, some_view, delete_event
+    payment_cancelled, stripe_webhook, some_view, event_signup, get_user#, delete_event
 
 urlpatterns = [
-    path('participant/api/par_home', participant_home_page, name='org_home'),
+    path('participant/api/par_home', participant_home_page, name='par_home'),
     path('participant/api/show-events/', show_events, name='show-events'),
     path('api/get_event/', get_event, name='get_event'),
     path('participant/api/show-events/<int:event_id>', show_event_details, name='show_event_details'),
@@ -31,5 +31,6 @@ urlpatterns = [
 	path('payment_cancelled', payment_cancelled, name='payment_cancelled'),
 	path('stripe_webhook', stripe_webhook, name='stripe_webhook'),
     path('some_template', some_view, name='some_template'),
-
+    path('participant/api/show-events/<int:event_id>/event_signup/', event_signup, name='event_signup'),
+    path('api/get_user/', get_user, name='get_user'),
 ]

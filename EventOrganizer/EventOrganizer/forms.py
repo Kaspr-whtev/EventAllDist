@@ -1,5 +1,5 @@
 from django import forms
-from .models import Event
+from .models import Event, Participant
 
 class EventForm(forms.ModelForm):    
     class Meta:
@@ -13,4 +13,9 @@ class DeleteEventForm(forms.Form):
 class EditEventForm(forms.Form):
     reason_for_edit = forms.CharField(label='Reason for Edit', max_length=500, required=False, widget=forms.Textarea)
 
+
+class NewUserForm(forms.ModelForm):
+    class Meta:
+        model = Participant
+        fields = ['username', 'email']
 

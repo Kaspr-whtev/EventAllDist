@@ -20,5 +20,13 @@
     {% else %}
         <p><strong>Brak ciasteczka JWT.</strong></p>
     {% endif %}
+    <h1>Login info</h1>
+    {% if user_authenticated %}
+    <p style="color:green;">User is authenticated.</p>
+    <p><strong>bool val:</strong> {{ user_authenticated }}</p>
+    {% else %}
+        <p style="color:orange;">User not authenticated.</p>
+        <p><strong>bool val:</strong> {{ user_authenticated }}</p>
+    {% endif %}
 </body>
 </html>

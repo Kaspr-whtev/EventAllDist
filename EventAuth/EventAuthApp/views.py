@@ -12,6 +12,9 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 import json
 from django.urls import reverse
 import jwt
+from django.views.decorators.csrf import csrf_exempt
+import requests
+from django.forms.models import model_to_dict
 
 
 # Create your views here.
@@ -23,20 +26,56 @@ def home(request):
 
 def logout_view(request):
     auth.logout(request)
-    response = redirect('/')
+    response = redirect('/eventauth')
     response.delete_cookie('JWT')
 
     return response
 
+# @csrf_exempt
+# def register(request):
+#     print("create user form", request.method)
 
+#     form = CreateUserForm()
+
+#     if request.method == "POST":
+#         form = CreateUserForm(request.POST)
+#         if form.is_valid():
+#             new_user = form.save()
+#             print(model_to_dict(new_user))
+#             r = requests.post('http://eventparticipant:8002/api/get_user/', data=model_to_dict(new_user))
+#             print(r.status_code)
+#             return redirect("my-login")
+        
+#     context = {'registerform': form}
+
+#     return render(request, 'register.html', context=context)
+
+@csrf_exempt
 def register(request):
+    print("create user form", request.method)
 
     form = CreateUserForm()
 
     if request.method == "POST":
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_user = form.save()
+            print(model_to_dict(new_user))
+
+            urls = [
+                'http://eventparticipant:8002/api/get_user/',
+                'http://eventnotification:8004/api/get_user/',
+                'http://eventorganizer:8003/api/get_user/'
+            ]
+            
+            data = model_to_dict(new_user)
+            for url in urls:
+                try:
+                    r = requests.post(url, data=data)
+                    print(f"Request to {url} returned status code {r.status_code}")
+                except requests.exceptions.RequestException as e:
+                    print(f"Request to {url} failed: {e}")
+
             return redirect("my-login")
         
     context = {'registerform': form}
@@ -53,7 +92,6 @@ def my_login(request):
             password = request.POST.get('password')
 
             user = authenticate(request, username=username, password=password)
-
             if user is not None:
                 payload = {
                     'username': user.username,  # Dodaj nazwę użytkownika do payloadu

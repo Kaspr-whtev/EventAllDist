@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-pben@86jfl58cat@$0p)r&mmp%uxahootycktmvyv**l_!ssat
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['host.docker.internal', '127.0.0.1', '127.0.0.1:8000', 'localhost', 'eventparticipant', 'eventorganizer']
+ALLOWED_HOSTS = ['host.docker.internal', '127.0.0.1', '127.0.0.1:8000', 'localhost', 'eventparticipant', 'eventorganizer', 'eventauth', 'eventnotification']
 
 
 # Application definition
@@ -165,3 +165,8 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False  # Ustawienie na True w środowisku produkcyjnym
 SESSION_COOKIE_SAMESITE = 'Lax'  # Lub 'Strict' w zależności od potrzeb
 SESSION_COOKIE_NAME = 'sessionid'
+
+
+AUTHENTICATION_BACKENDS = [
+    'EventParticipant.backends.CustomBackend', 
+]

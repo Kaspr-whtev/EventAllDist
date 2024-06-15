@@ -1,8 +1,8 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
-from .forms import EventForm
-from .models import Event
+from .forms import EventForm, EventSignupForm, NewUserForm
+from .models import Event, Participant
 from paypal.standard.forms import PayPalPaymentsForm
 from django.conf import settings
 import uuid
@@ -13,14 +13,24 @@ from EventParticipant.models import UserPayment
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import jwt
+from .utils import authenticate_user
+from django.contrib.auth.decorators import login_required
+
+
 
 
 def participant_home_page(request):
     return render(request, 'par_home.html', context={"path_show_events": '/participant/api/show-events/'})
 
 def show_events(request):
-    events = Event.objects.all()
-    return render(request, 'show_events.html', context={'events': events, 'path_par_home': '/participant/api/par_home'})
+    authenticated = authenticate_user(request)
+    print("auth res = " + str(authenticated))
+    if authenticated:
+        events = Event.objects.all()
+        users = Participant.objects.all()
+        return render(request, 'show_events.html', context={'events': events, 'users': users, 'path_par_home': '/participant/api/par_home'})
+    else:  
+        return render(request, 'par_home.html')
 
 
 @csrf_exempt
@@ -37,11 +47,28 @@ def get_event(request):
 
     return JsonResponse(data={})
 
+@csrf_exempt
+def get_user(request):
+    print("create user form", request.method, request.POST)
+    if request.method == "POST":
+        data = request.POST.dict()
+        print(data)
+        # data["name"] = data.pop("organizer_name", "")
+        form = NewUserForm(data)
+
+        if form.is_valid():
+            form.save()
+
+    return JsonResponse(data={})
+
 
 def show_event_details(request, event_id):
     # Pobierz obiekt wydarzenia na podstawie przekazanego identyfikatora
     event = get_object_or_404(Event, pk=event_id)
     host = request.get_host()
+
+    participants = event.participants.all()
+
 
     # paypal_checkout = {
     #     'business': settings.PAYPAL_RECEIVER_EMAIL,
@@ -58,6 +85,7 @@ def show_event_details(request, event_id):
 
     context = {
         'event': event,
+        'participants': participants,
         #'paypal': paypal_payment_form
     }
 
@@ -151,30 +179,59 @@ def stripe_webhook(request):
 
 
 def some_view(request):
-    # Uzyskanie ciasteczka JWT z żądania
-    jwt_token = request.COOKIES.get('JWT', None)
+    auth_context = authenticate_user(request)
+    return render(request, 'some_template.html', context=auth_context)
+    # user_authenticated = False
+    # # Uzyskanie ciasteczka JWT z żądania
+    # jwt_token = request.COOKIES.get('JWT', None)
 
-    # Możesz teraz wykorzystać wartość ciasteczka JWT, na przykład:
-    jwt_payload = None
-    error_message = None
-    username = None
-    email = None
+    # jwt_payload = None
+    # error_message = None
+    # username = None
+    # email = None
 
-    if jwt_token:
-        # Dekodowanie zawartości tokena JWT
-        try:
-            jwt_payload = jwt.decode(jwt_token, key='secret', algorithms=['HS256'])  # Dodaj algorytm dekodowania
-            # Sprawdź, czy payload zawiera nazwę użytkownika i adres e-mail
-            if 'username' in jwt_payload:
-                username = jwt_payload['username']
-            if 'email' in jwt_payload:
-                email = jwt_payload['email']
-        except jwt.ExpiredSignatureError:
-            error_message = 'Token JWT wygasł.'
-        except jwt.InvalidTokenError as e:
-            error_message = f'Nieprawidłowy token JWT: {str(e)}'
+    # if jwt_token:
+    #     # Dekodowanie zawartości tokena JWT
+    #     try:
+    #         jwt_payload = jwt.decode(jwt_token, key='secret', algorithms=['HS256'])  
+    #         if 'username' in jwt_payload:
+    #             username = jwt_payload['username']
+    #         if 'email' in jwt_payload:
+    #             email = jwt_payload['email']
 
-    # Przekazanie danych do szablonu HTML
-    context = {'jwt_payload': jwt_payload, 'jwt_token': jwt_token, 'error_message': error_message, 'username': username, 'email': email}
-    return render(request, 'some_template.html', context=context)
+    #         if username and email:
+    #             participant = Participant.objects.filter(username=username, email=email).first()
+    #             if participant:
+    #                 user_authenticated = True
+    #                 user = authenticate(username=username, password=None)  # Password=None, bo nie mamy hasła
+    #                 if user is not None:
+    #                     login(request, user)
+
+    #     except jwt.ExpiredSignatureError:
+    #         error_message = 'Token JWT wygasł.'
+    #     except jwt.InvalidTokenError as e:
+    #         error_message = f'Nieprawidłowy token JWT: {str(e)}'
+
+    # # Przekazanie danych do szablonu HTML
+    # context = {'jwt_payload': jwt_payload, 'jwt_token': jwt_token, 'error_message': error_message, 'username': username, 'email': email, 'user_authenticated': user_authenticated}
+    # return render(request, 'some_template.html', context=context)
+
+
+def event_signup(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        form = EventSignupForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            username = form.cleaned_data['username']
+            participant, created = Participant.objects.get_or_create(
+                email=email,
+                defaults={'username': username}
+            )
+            event.participants.add(participant)
+            return redirect('show-events')
+    else:
+        form = EventSignupForm()
+    return render(request, 'event_signup.html', {'form': form, 'event': event})
+
 

@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.mail import send_mail
-from .models import Emails
+from .models import UsersToEmail
+from django.views.decorators.csrf import csrf_exempt
+from .forms import NewUserForm
+from django.http import HttpResponse, JsonResponse
 
 
 def home(request):
@@ -16,4 +19,23 @@ def home(request):
 
 
 def get_all_user_emails():
-    return Emails.objects.values_list('email', flat=True)
+    return UsersToEmail.objects.values_list('email', flat=True)
+
+def show_users(request):
+    users = UsersToEmail.objects.all()
+    return render(request, 'show_users.html', context={'users': users, 'path_noti_home': '/eventnoti'})
+
+
+@csrf_exempt
+def get_user(request):
+    print("create user form", request.method, request.POST)
+    if request.method == "POST":
+        data = request.POST.dict()
+        print(data)
+        # data["name"] = data.pop("organizer_name", "")
+        form = NewUserForm(data)
+
+        if form.is_valid():
+            form.save()
+
+    return JsonResponse(data={})
