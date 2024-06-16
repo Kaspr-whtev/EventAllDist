@@ -27,6 +27,11 @@ def show_users(request):
 
 
 @csrf_exempt
+def edit_event(request):
+    print("participants from organizer: ", request.method, request.POST)
+
+
+@csrf_exempt
 def get_user(request):
     print("create user form", request.method, request.POST)
     if request.method == "POST":

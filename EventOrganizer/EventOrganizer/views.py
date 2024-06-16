@@ -57,6 +57,12 @@ class EventViewSet(viewsets.ViewSet):
                 print(f"Successful edit with reason: {reason_for_edit}")
                 edited_event = form.save()
                 r = requests.post('http://eventparticipant:8002/api/edit_event/', data=model_to_dict(edited_event))
+
+                participants = edited_event.participants.all()
+                data_list = list(participants.values())
+                data_list.append({'event_id', pk})
+                data_list.append({'reason_for_edit', reason_for_edit})
+                requests.post('http://eventnotification:8004/api/edit_event/', data=data_list)
                 print(r.status_code)
                 return redirect('show-events')
         else:
