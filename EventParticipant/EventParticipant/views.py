@@ -243,6 +243,7 @@ def some_view(request):
     # return render(request, 'some_template.html', context=context)
 
 
+@csrf_exempt
 def event_signup(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
@@ -255,6 +256,9 @@ def event_signup(request, event_id):
                 defaults={'username': username}
             )
             event.participants.add(participant)
+
+            data = {'email': email, 'username': username, 'id': event_id}
+            r = requests.post('http://eventorganizer:8003/api/event_signup/', data=data)
             return redirect('show-events')
     else:
         form = EventSignupForm()

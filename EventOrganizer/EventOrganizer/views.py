@@ -135,3 +135,19 @@ def get_user(request):
 def show_users(request):
     users = Participant.objects.all()
     return render(request, 'show_users.html', context={'users': users, 'path_org_home': '/organizer/api/org_home'})
+
+
+@csrf_exempt
+def event_signup(request):
+    if request.method == "POST":
+        data = request.POST.dict()
+        email = data.get('email')
+        username = data.get('username')
+        event_id = data.get('id')
+        event = get_object_or_404(Event, id=event_id)
+        participant, created = Participant.objects.get_or_create(
+            email=email,
+            defaults={'username': username}
+        )
+        event.participants.add(participant)
+    return JsonResponse(data={})
